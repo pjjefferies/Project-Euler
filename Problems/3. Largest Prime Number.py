@@ -23,22 +23,22 @@ def findAllFactors(number):
     testFactor = 3
     maxSingleFactorLimit = number**(0.5)
     maxAllFactorLimit = number / 3
-    print("Initial test factor:", testFactor)
+    #print("Initial test factor:", testFactor)
     counter = 0
     while testFactor < maxAllFactorLimit:
         counter += 1
         if counter >= 1000000:
-            print("testFactor:", testFactor, "with limit:", maxAllFactorLimit)
+            #print("testFactor:", testFactor, "with limit:", maxAllFactorLimit)
             counter = 0
         if number % testFactor == 0:
-            print("found a factor:", testFactor)
+            #print("found a factor:", testFactor)
             listOfFactors.append(testFactor)
             number = int(number / testFactor)
             if testFactor > maxSingleFactorLimit:
                 break
-            print("In findAllFactors, new number to find factors of", number)
+            #print("In findAllFactors, new number to find factors of", number)
             maxAllFactorLimit = int(maxAllFactorLimit / testFactor) + 2
-            print("maxAllFactorLimit:", maxAllFactorLimit)
+            #print("maxAllFactorLimit:", maxAllFactorLimit)
         testFactor += 2
     listOfFactors.append(number)
     #print("Returning a list of factors", listOfFactors)
@@ -53,23 +53,12 @@ if __name__ == '__main__':
         listOfFactorsNew1 = [2] + findAllFactors(testNumber / 2)
     else:
         listOfFactorsNew1 = findAllFactors(testNumber)
-    print("listOfFactorsNew1 before while loop:", listOfFactorsNew1)
-    """
-    while True:
-        listOfFactorsNew2 = []
-        for factor in listOfFactorsNew1:
-            print("In for loop, factor:", factor)
-            listOfFactorsNew2 += findAllFactors(factor)
-        listOfFactorsNew2.sort()
-        if listOfFactorsNew1 == listOfFactorsNew2:
-            break
-        listOfFactorsNew1 = listOfFactorsNew2
-    """
-    print("Prime factors of", testNumber, "are", listOfFactorsNew1, ".")
-    productOfFactors = 1
-    for factor in listOfFactorsNew1:
-        productOfFactors *= factor
-    print("Product of prime factors is:", productOfFactors)
+    #print("listOfFactorsNew1 before while loop:", listOfFactorsNew1)
+    #print("Prime factors of", testNumber, "are", listOfFactorsNew1, ".")
+    #productOfFactors = 1
+    #for factor in listOfFactorsNew1:
+    #    productOfFactors *= factor
+    #print("Product of prime factors is:", productOfFactors)
     largestFactor = max(listOfFactorsNew1)
     totalTime = time() - startTime
     print("\nLargest prime factor of", testNumber, "is", largestFactor, ".")
