@@ -56,3 +56,12 @@ if __name__ == '__main__':
     totalTime = time() - startTime
     print("The sum of all primes less than", maxValueOfPrime, "is:", sumOfPrimesToLimit)
     print("Time to find:", totalTime)
+    
+"""
+Result:
+
+The sum of all primes less than 1999999 is: 142913828922
+Time to find: 2509.1645250320435
+
+148,934 primes found
+"""
