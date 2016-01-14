@@ -39,7 +39,7 @@ def findAllFactors(aNumber):
             factors.add(potentialFactor)
             factors.add(int(aNumber/potentialFactor))
             maxAllFactorLimit = int(aNumber/potentialFactor) - 1
-        potentialFactor += 2
+        potentialFactor += 1
         if potentialFactor > maxAllFactorLimit:
             break
     return factors
@@ -53,13 +53,14 @@ if __name__ == '__main__':
     while True:
         triNumFactors = findAllFactors(triNum)
         if len(triNumFactors) > maxFactors:
+            maxFactorNum = triNum
             maxFactors = len(triNumFactors)
             maxFactorsList = triNumFactors
         if len(triNumFactors) >= minNumFactors:
             break
         if (triNum) % 1000 == 0:
-            print("Tried triNum:", triNum, ". ",
-                  maxFactors, "max. factors found:", maxFactorsList)
+            print("Tried triNum:", triNum, ". Highest triNum:", maxFactorNum,
+                  ". ", maxFactors, "max. factors found.")
         triNum += 1
     totalTime = time() - startTime
     print("The value of the first triangle number to have over 500 factors is", triNum)
