@@ -25,6 +25,136 @@ What is the value of the first triangle number to have over five hundred divisor
 
 from time import time
 
+def isANewPrime(number, lowerPrimes):
+    sqrtNumber = number**(1/2)
+    #print("number:", number, ", sqrtNumber:", sqrtNumber)
+    for oldPrime in lowerPrimes[1:]:
+        if ((number % oldPrime) == 0):
+            #print(number, "is not a prime. oldPrime rejected on:", oldPrime)
+            return False
+        if (oldPrime > sqrtNumber): #only one primefactor > sqrt
+            return True
+    #print(number, "is a prime")
+    return True
+
+
+def findNPrimes(n):
+    nthPrimeToFind = n
+    primes = [2, 3]
+    k = 1       #all primes above 3 can be written as 6k +/- 1
+    while True:
+        #print("Primes found:", primes, ". Trying:", newTry)
+        if isANewPrime(6*k-1, primes):
+            primes.append(6*k-1)
+        if isANewPrime(6*k+1, primes):
+            primes.append(6*k+1)
+        if len(primes) >= nthPrimeToFind + 1:
+            break
+        k += 1
+    return primes
+
+
+def getPrimeExp(aTriNum, thisPrime):
+    anExp = 0
+    while True:
+        if aTriNum % thisPrime == 0:
+            aTriNum = int(aTriNum / thisPrime)
+            anExp += 1
+        else:
+            return anExp
+
+def findPrimes(aNum, primes):
+    aNumOG = aNum
+    if aNum == 1:
+        return []
+    thePrimes = []
+    for aPrime in primes:
+        if aNum % aPrime == 0:
+            aPrimeExp = getPrimeExp(aNum, aPrime)
+            #print("aNum:", aNum, ", aPrime:", aPrime, ", aPrimeExp:", aPrimeExp)
+            thePrimes.append(aPrime)
+            aNum = int(aNum / (aPrime**aPrimeExp))
+            if aNum == 1:
+                return thePrimes
+    print("If you got here, that's a problem. aNum:", aNum, ", thePrimes:",
+          thePrimes, ", aNumOG:", aNumOG)
+    """
+    k = 1
+    while aNum > 1:
+        aNumStart = aNum
+        if aNum % 2 == 0:
+            thePrimes = [2]
+            aNum /= 2
+        else:
+            thePrimes = []
+        if aNum % 3 == 0:
+            thePrimes.append(3)
+            aNum /= 3
+        print("aNum:", aNum, ", thePrimes:", thePrimes)
+        print("Trying)
+        if aNum % (6*k-1) == 0:
+            thePrimes.append(6*k-1)
+            aNum /= (6*k-1)
+        if aNum % (6*k+1) == 0:
+            thePrimes.append(6*k+1)
+            aNum /= (6*k+1)
+        k += 1
+        if aNum == aNumStart:
+            print("Not finding new primes. thePrimes", thePrimes)
+    return thePrimes
+    """
+
+#Faster method
+if __name__ == '__main__':
+    startTime = time()
+    minNumFactors = 501
+    maxFactorsFound = 0
+    triNum = 3
+    n = 2
+    primes = findNPrimes(1500)
+    while True:
+        if n % 2 == 0:
+            triNumFirstHalf  = n + 1
+            triNumSecondHalf = int(n / 2)
+        else:
+            triNumFirstHalf  = int((n + 1) / 2)
+            triNumSecondHalf = n
+        #print("triNum:", triNum, ", n:", n)
+        #print("Finding primes for:", triNumFirstHalf, "and", triNumSecondHalf)
+        thisNumPrimes = (findPrimes(triNumFirstHalf, primes)
+                       + findPrimes(triNumSecondHalf, primes))
+        thisPrimeExp = []
+        for aPrime in thisNumPrimes:
+            thisPrimeExp.append(getPrimeExp(triNum, aPrime))
+        divisors = 1
+        for anExp in thisPrimeExp:
+            divisors *= (anExp + 1)
+        if divisors >= minNumFactors:
+            break
+        if divisors > maxFactorsFound:
+            maxFactorsFound = divisors
+        #if n % 1000 == 0:
+        #    print("Tried triNum:", triNum, ". ",
+        #          maxFactorsFound, "max. factors found.")
+        n += 1
+        triNum += n
+    totalTime = time() - startTime
+    print("The value of the first triangle number to have over 500 factors is", triNum)
+    print("Time to find:", totalTime)
+
+"""
+
+Result
+
+The value of the first triangle number to have over 500 factors is 76576500
+Time to find: 1.438788890838623
+
+"""
+
+"""
+
+Slower method
+
 def findAllFactors(aNumber):
     #print("In findAllFactors with number:", number)
     if aNumber % 2 == 0:
@@ -49,6 +179,7 @@ if __name__ == '__main__':
     startTime = time()
     minNumFactors = 501
     triNum = 1
+    n = 1
     maxFactors = 0
     while True:
         triNumFactors = findAllFactors(triNum)
@@ -61,7 +192,19 @@ if __name__ == '__main__':
         if (triNum) % 1000 == 0:
             print("Tried triNum:", triNum, ". Highest triNum:", maxFactorNum,
                   ". ", maxFactors, "max. factors found.")
-        triNum += 1
+        n += 1
+        triNum += n
     totalTime = time() - startTime
     print("The value of the first triangle number to have over 500 factors is", triNum)
     print("Time to find:", totalTime)
+
+"""
+
+"""
+
+Result
+
+The value of the first triangle number to have over 500 factors is 76576500
+Time to find: 9.79673719406128
+
+"""
