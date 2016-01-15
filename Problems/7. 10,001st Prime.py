@@ -37,12 +37,12 @@ if __name__ == '__main__':
         #print("Primes found:", primes, ". Trying:", newTry)
         if isANewPrime(6*k-1, primes):
             primes.append(6*k-1)
-            if ((len(primes) - 1) % incrementToPrint == 0):
-                print(len(primes)-1, "primes found.")
+            #if ((len(primes) - 1) % incrementToPrint == 0):
+            #    print(len(primes)-1, "primes found.")
         if isANewPrime(6*k+1, primes):
             primes.append(6*k+1)
-            if ((len(primes) - 1) % incrementToPrint == 0):
-                print(len(primes)-1, "primes found.")
+            #if ((len(primes) - 1) % incrementToPrint == 0):
+            #    print(len(primes)-1, "primes found.")
         if len(primes) >= nthPrimeToFind + 1:
             break
         k += 1
