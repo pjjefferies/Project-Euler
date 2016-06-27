@@ -49,10 +49,10 @@ if __name__ == '__main__':
     startTime = time()
     testNumber = 600851475143
     #print("\n\nStarting to find all primes")
-    if testNumber % 2 == 0:
-        listOfFactorsNew1 = [2] + findAllFactors(testNumber / 2)
-    else:
-        listOfFactorsNew1 = findAllFactors(testNumber)
+    #if testNumber % 2 == 0:
+    #    listOfFactorsNew1 = [2] + findAllFactors(testNumber / 2)
+    #else:
+    listOfFactorsNew1 = findAllFactors(testNumber)
     #print("listOfFactorsNew1 before while loop:", listOfFactorsNew1)
     #print("Prime factors of", testNumber, "are", listOfFactorsNew1, ".")
     #productOfFactors = 1
