@@ -99,6 +99,7 @@ def fracCanBeReduced(numerator, denominator, factorsDict, primesList):
     return False
 """
 
+
 def fracCanBeReducedPrimeProdDen(int aNum, int[:] ShortPrimesList):
     cdef int aPrime
     for aPrime in ShortPrimesList:
@@ -120,13 +121,13 @@ def calcResilience(int denominator, int[:] primesInDenominator):
     return resilience
 
 
-def findSinglePrimeDenRange(maxPrimeToFind, primeList):
+def findSinglePrimeDenRange(maxPrimeToFind, primesList):
     minSolution = [1, 0]
     for primeCountInDen in range(2, maxPrimeToFind):
         denominator = reduce(lambda x, y: x*y, primesList[:primeCountInDen])
         if denominator not in factorsDict:
             factorsDict[denominator] = primesList[:primeCountInDen]
-        print("Denom:", denominator, flush=True)
+        print("Denom:", denominator)  # , flush=True)
 
         primesInDenominator = primesList[:primeCountInDen]
         resilience = calcResilience(denominator, primesInDenominator)
@@ -134,7 +135,7 @@ def findSinglePrimeDenRange(maxPrimeToFind, primeList):
         print('New Resilience Found: Denom.:', str(denominator) +
               ', Resilience:', str(resilience) +
               ', Resilience Ratio:', resilience/resilience_limit,
-              flush=True)
+              )  # flush=True)
 
         if resilience < minSolution[1]:
             secondBestSolution = minSolution
@@ -152,7 +153,7 @@ def findMultPrimeDenRange(minSolution, secondBestSolution,
                                     [denMultiplier])
         with suppress(ValueError):
             factorsDict[denominator].remove(1)
-        print("Denom:", denominator, flush=True)
+        print("Denom:", denominator)  # , flush=True)
 
         primesInDenominator = factorsDict[secondBestSolution[0]]
         resilience = calcResilience(denominator, primesInDenominator)
@@ -160,7 +161,7 @@ def findMultPrimeDenRange(minSolution, secondBestSolution,
         print('New Resilience Found: Denom.:', str(denominator) +
               ', Resilience:', str(resilience) +
               ', Resilience Ratio:', resilience/resilience_limit,
-              flush=True)
+              )  # flush=True)
 
         if resilience < resilience_limit:
             return denominator, resilience
