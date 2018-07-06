@@ -21,12 +21,15 @@ Find the smallest denominator d, having a resilience R(d) < 15499/94744 .
 from time import time
 from functools import reduce
 from contextlib import suppress
+# from p243_Resilience_cython import fracCanBeReducedPrimeProdDen
+from p243_Resilience_cython import calcResilience
 # import csv
+import numpy as np
 # import pandas as pd
 
 verbose = True
 
-
+"""
 def findPrimes(maxValueOfPrime):   # Sieve of Eratosthenes
     maxValueOfPrime = int(maxValueOfPrime)
     counter = 0
@@ -47,77 +50,7 @@ def findPrimes(maxValueOfPrime):   # Sieve of Eratosthenes
     primes = [aPrimeNo for aPrimeNo in range(2, len(primeValues))
               if primeValues[aPrimeNo]]
     return primes
-
-
 """
-def findPrimeFactors(number, primesList):
-    listOfFactors = []
-    reducedNumber = number
-    # maxSingleFactorLimit = int(number**(0.5)) + 1
-    maxSingleFactorLimit = int(number) + 1
-    for aPrime in primesList:
-        # print("aPrime:", aPrime, ", maxSingleFactorLimit:",
-        # maxSingleFactorLimit)
-        if aPrime > maxSingleFactorLimit:
-            break
-        if reducedNumber % aPrime == 0:
-            listOfFactors.append(aPrime)
-            # listOfFactors.add(aPrime)
-            reducedNumber = int(reducedNumber / aPrime)
-            # listOfFactors.add(reducedNumber)
-            if reducedNumber in primesList:
-                listOfFactors.append(reducedNumber)
-                break
-            # print("listOfFactors after adding", aPrime, ":", listOfFactors,
-            # "in", number)
-    listOfFactors.sort()
-    # listOfFactors.discard(1)
-    if 1 in listOfFactors:
-        listOfFactors = listOfFactors[1:]
-    # listOfFactors = list(listOfFactors)
-    # listOfFactors.sort()
-    return listOfFactors
-
-
-def findAllPrimeFactors(maxNumber, primesList):
-    factorsDict = {}
-    dispIncr = maxNumber / 10
-    for i in range(1, maxNumber+1):
-        if (i % dispIncr == 0):
-            print("Finding factor of", i, "out of", maxNumber)
-        factorsDict[i] = findPrimeFactors(i, primesList)
-    return factorsDict
-
-
-def fracCanBeReduced(numerator, denominator, factorsDict, primesList):
-    if numerator not in factorsDict:
-        factorsDict[numerator] = findPrimeFactors(numerator, primesList)
-    numFacts = factorsDict[numerator]
-    for factor in factorsDict[denominator]:
-        if factor in numFacts:
-            return True
-    return False
-"""
-
-def fracCanBeReducedPrimeProdDen(int aNum, int[:] ShortPrimesList):
-    cdef int aPrime
-    for aPrime in ShortPrimesList:
-        if aNum % aPrime == 0:
-            return True
-    return False
-
-
-def calcResilience(int denominator, int[:] primesInDenominator):
-    cdef int resiliantFractionCount = 0
-    cdef int numerator
-    cdef double resilience
-
-    for numerator in range(1, denominator):
-        if not(fracCanBeReducedPrimeProdDen(numerator,
-                                            primesInDenominator)):
-            resiliantFractionCount += 1
-    resilience = float(resiliantFractionCount) / float(denominator-1)
-    return resilience
 
 
 def findSinglePrimeDenRange(maxPrimeToFind, primeList):
@@ -126,15 +59,27 @@ def findSinglePrimeDenRange(maxPrimeToFind, primeList):
         denominator = reduce(lambda x, y: x*y, primesList[:primeCountInDen])
         if denominator not in factorsDict:
             factorsDict[denominator] = primesList[:primeCountInDen]
-        print("Denom:", denominator)  # , flush=True)
+        print("Denom:", denominator, flush=True)
 
         primesInDenominator = primesList[:primeCountInDen]
-        resilience = calcResilience(denominator, primesInDenominator)
+        primesInDenominator = np.array(primesInDenominator)
+        print('primesInDenominator:', primesInDenominator)
+
+        max_prime_in_denominator = primesInDenominator.max()
+
+        resilient_numerators = primesList[
+            (primesList > max_prime_in_denominator) &
+            (primesList < denominator)]
+
+        print('resilient_numerators:', resilient_numerators)
+
+        resilientFractionCount = 1 + len(resilient_numerators)
+        resilience = float(resilientFractionCount) / float(denominator-1)
 
         print('New Resilience Found: Denom.:', str(denominator) +
               ', Resilience:', str(resilience) +
               ', Resilience Ratio:', resilience/resilience_limit,
-              )  # flush=True)
+              flush=True)
 
         if resilience < minSolution[1]:
             secondBestSolution = minSolution
@@ -152,15 +97,19 @@ def findMultPrimeDenRange(minSolution, secondBestSolution,
                                     [denMultiplier])
         with suppress(ValueError):
             factorsDict[denominator].remove(1)
-        print("Denom:", denominator)  # , flush=True)
+        print("Denom:", denominator, flush=True)
 
         primesInDenominator = factorsDict[secondBestSolution[0]]
-        resilience = calcResilience(denominator, primesInDenominator)
+        primesInDenominator = np.array(primesInDenominator)
+        print('primesInDenominator:', primesInDenominator)
+        resiliantFractionCount = calcResilience(denominator,
+                                                primesInDenominator)
+        resilience = float(resiliantFractionCount) / float(denominator-1)
 
         print('New Resilience Found: Denom.:', str(denominator) +
               ', Resilience:', str(resilience) +
               ', Resilience Ratio:', resilience/resilience_limit,
-              )  # flush=True)
+              flush=True)
 
         if resilience < resilience_limit:
             return denominator, resilience
@@ -170,12 +119,15 @@ if __name__ == '__main__':
     startTime = time()
     print("\n\n")
 
-    maxDenom = int(1e8)
+    maxDenom = 1_000_000
+    maxPrimeToFind = maxDenom
     resilience_limit = 15499/94744     # 0.1635881955585578
 
-    maxPrimeToFind = 100
-    primesList = findPrimes(maxPrimeToFind)
-    print("Found", len(primesList), "primes between 2 and", maxPrimeToFind,
+    prime_fn = 'Primes_up_to_' + str(maxDenom) + '.csv'
+
+    primesList = np.genfromtxt(prime_fn, dtype=int)
+
+    print("Loaded", len(primesList), "primes between 1 and", maxPrimeToFind,
           "\n\n")
 
     factorsDict = {}
