@@ -1,119 +1,109 @@
 # -*- coding: utf-8 -*-
 """
+Project Euler
+
+Investigating multiple reflections of a laser beam
+Problem 144 
+
+In laser physics, a "white cell" is a mirror system that acts as a delay line
+for the laser beam. The beam enters the cell, bounces around on the mirrors,
+and eventually works its way back out.
+
+The specific white cell we will be considering is an ellipse with the equation
+4x2 + y2 = 100
+
+The section corresponding to −0.01 ≤ x ≤ +0.01 at the top is missing, allowing
+the light to enter and exit through the hole.
+
+
+The light beam in this problem starts at the point (0.0,10.1) just outside the
+white cell, and the beam first impacts the mirror at (1.4,-9.6).
+
+Each time the laser beam hits the surface of the ellipse, it follows the usual
+law of reflection "angle of incidence equals angle of reflection." That is,
+both the incident and reflected beams make the same angle with the normal line
+at the point of incidence.
+
+In the figure on the left, the red line shows the first two points of contact
+between the laser beam and the wall of the white cell; the blue line shows the
+line tangent to the ellipse at the point of incidence of the first bounce.
+
+The slope m of the tangent line at any point (x,y) of the given ellipse is:
+    m = −4x/y
+
+The normal line is perpendicular to this tangent line at the point of
+incidence.
+
+The animation on the right shows the first 10 reflections of the beam.
+
+How many times does the beam hit the internal surface of the white cell before exiting?
+
 Created on Wed Jan 16 22:47:34 2019
 
 @author: PaulJ
 """
 
+from time import time
 import math
-
-
-def line_y_intercept(x, y, slope):
-    return (y - slope * x)
-
-
-def quadratic_equation_solution(a, b, c):
-    if 4*a*c > b**2:
-        raise ValueError('Real roots only supported at this time')
-    if 4*a*c == b**2:  # Line is tangent to ellipse
-        x = -b / (2*a)
-        return x, x
-
-    num2 = (b**2 - 4*a*c)**(0.5)
-    x1 = (-b + num2)/(2*a)
-    x2 = (-b - num2)/(2*a)
-
-    return x1, x2
-
-
-def line_ellipse_intercepts(line_slope, line_point_x, line_point_y,
-                            ellipse_scale_a, ellipse_scale_b):
-    m = line_slope
-    x1 = line_point_x
-    y1 = line_point_y
-    a0 = ellipse_scale_a
-    a02 = a0 ** 2
-    b0 = ellipse_scale_b
-    b02 = b0 ** 2
-    mdb02 = m / b02
-    y1_minus_m_x = y1 - m * x1
-
-    a1 = 1 / a02 + mdb02
-    b1 = 2 * mdb02 * y1_minus_m_x
-    c1 = (y1_minus_m_x ** 2) / b02 - 1
-
-    try:
-        x2_1, x2_2 = quadratic_equation_solution(a=a1, b=b1, c=c1)
-    except ValueError:
-        raise ValueError('Line does not intercept ellipse')
-
-    if x2_1 == x2_2:  # Line tangent to ellipse, only one point to consider
-        x2 = x2_1
-        y2 = m * (x2 - x1) + y1
-    else:
-        y2_1 = m * (x2_1 - x1) + y1
-        d1 = ((x2_1 - x1) ** 2 + (y2_1 - y1) ** 2) ** 0.5
-        y2_2 = m * (x2_2 - x1) + y1
-        d2 = ((x2_2 - x1) ** 2 + (y2_2 - y1) ** 2) ** 0.5
-    
-        # Choose x2, y2 that is furthest from x1, y1
-        if d1 > d2:
-            x2 = x2_1
-            y2 = y2_1
-        else:
-            x2 = x2_2
-            y2 = y2_2
-
-    return x2, y2
+from line_ellipse_intercepts import line_ellipse_intercepts
 
 
 if __name__ == '__main__':
-    contact_points = [[0, 10.1], [1.4, -9.6]]
+    startTime = time()
+    print('\n')
+    X = 0
+    Y = 1
+    LAST = -1
+    contact_points = [[0, 10.1]]
+    first_target_point = [1.4, -9.6]
     ellipse_scale_a = 5
     ellipse_scale_b =  10
-    safety_counter = 0
 
-    x_start = contact_points[-1][0]
-    y_start = contact_points[-1][1]
-    # b = contact_points[0][1]
-    m_out = ((contact_points[-1][1] - contact_points[-2][1]) /
-             (contact_points[-1][0] - contact_points[-2][0]))
-
-    x_in = 0
-    y_in = 10.1
+    x_start = contact_points[LAST][X]
+    y_start = contact_points[LAST][Y]
+    m_out = ((first_target_point[Y] - contact_points[LAST][Y]) /
+             (first_target_point[X] - contact_points[LAST][X]))
 
     x_1_test, y_1_test = line_ellipse_intercepts(
             line_slope = m_out,
-            line_point_x = x_in,
-            line_point_y = y_in,
+            line_point_x = contact_points[LAST][X],
+            line_point_y = contact_points[LAST][Y],
             ellipse_scale_a = ellipse_scale_a,
             ellipse_scale_b = ellipse_scale_b)
 
-    if x_1_test != x_start or y_1_test != y_start:
-        print('x_1_test:', x_1_test, '- y_1_test:', y_1_test)
-        print('x_start:', x_start, ' - y_start:', y_start)
-        raise ValueError('Line Ellipse intercept not working')
-
-    while not (abs(contact_points[-1][0]) <= 0.01 and
-               contact_points[-1][1] > 9):
-        safety_counter += 1
-        if safety_counter % 1000 == 0:
-            print('bounce_count:', safety_counter)
-        if safety_counter >= 1e6:
-            break
+    while (not (abs(contact_points[LAST][X]) <= 0.01 and
+                contact_points[LAST][Y] > 9) or
+           len(contact_points) == 1):
         m_in = m_out
-        x_start, y_start = contact_points[-1]
 
         x_end, y_end = line_ellipse_intercepts(
             line_slope = m_in,
-            line_point_x = contact_points[1][0],
-            line_point_y = contact_points[1][1],
+            line_point_x = contact_points[LAST][X],
+            line_point_y = contact_points[LAST][Y],
             ellipse_scale_a = ellipse_scale_a,
             ellipse_scale_b = ellipse_scale_b)
         contact_points.append([x_end, y_end])
-        m_tan = -4 * contact_points[-1][0] / contact_points[-1][1]
+        # print('last contact points:', contact_points[-1])
+        m_tan = -4 * contact_points[LAST][X] / contact_points[LAST][Y]
+        theta_tan = math.atan(m_tan)
         theta_2_in = math.atan(abs((m_tan - m_in)/(1 + m_tan * m_in)))
         theta_2_out = math.pi - theta_2_in
-        m_out = math.tan(theta_2_out)
+        alpha_2_out = theta_tan + theta_2_out
+        m_out = math.tan(alpha_2_out)
 
     bounces = len(contact_points) - 2
+
+    totalTime = time() - startTime
+    print('\nThere were', bounces, 'bounces before exit')
+    print('Time to find:', '{:,.3f} s'.format(totalTime))
+
+"""
+Result:
+
+There were 354 bounces before exit
+Time to find: 0.004 s
+    
+"""
+
+
+
