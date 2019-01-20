@@ -56,10 +56,61 @@ if __name__ == '__main__':
     startTime = time()
     print('\n')
 
-    max_sum = 1000  # 1e25
+    max_sum = 10000000000000000000000000  # 1e25
     fs_of_max_sums = {}
 
-    for max_sum in [1e1, 1e2, 1e3, 1e4, 1e5]:
+    pow_2s = build_2_pow_list(max_sum)
+
+    max_below = build_max_below(pow_2s, max_sum)
+
+    good_sums_counter = 0
+
+    """
+    # Find the sum with using the highest values
+    last_ternary_string = ''
+    sum_so_far = 0
+    for a_2_pow, a_pow_2 in reversed(list(enumerate(pow_2s))):
+        if sum_so_far + 2 * a_pow_2 <= max_sum:
+            print('\nsum_so_far + 2 * a_pow_2:', sum_so_far + 2 * a_pow_2,
+                  '\n             max_sum:', max_sum)
+            sum_so_far += (2 * a_pow_2)
+            last_ternary_string += '2'
+        elif sum_so_far + a_pow_2 <= max_sum:
+            print('\nsum_so_far + a_pow_2:', sum_so_far + a_pow_2,
+                  '\n             max_sum:', max_sum)
+            sum_so_far += a_pow_2
+            last_ternary_string += '1'
+        else:
+            last_ternary_string += '0'
+        print('a_2_pow:', a_2_pow, ', a_pow_2:', a_pow_2, ', sum_so_far:',
+              sum_so_far, '\nlog(sum_so_far, 10):',
+              math.log(sum_so_far, 10), sum_so_far/max_sum,
+              max_sum - sum_so_far, '\n\n')
+
+    # Find the sum with using the lowest values
+    first_ternary_string = ''
+    sum_so_far = 0
+    for a_2_pow, a_pow_2 in enumerate(pow_2s):
+        if sum_so_far + 2 * a_pow_2 <= max_sum:
+            print('\nsum_so_far + 2 * a_pow_2:', sum_so_far + 2 * a_pow_2,
+                  '\n             max_sum:', max_sum)
+            sum_so_far += (2 * a_pow_2)
+            first_ternary_string += '2'
+        elif sum_so_far + a_pow_2 <= max_sum:
+            print('\nsum_so_far + a_pow_2:', sum_so_far + a_pow_2,
+                  '\n             max_sum:', max_sum)
+            sum_so_far += a_pow_2
+            first_ternary_string += '1'
+        else:
+            first_ternary_string += '0'
+        print('a_2_pow:', a_2_pow, ', a_pow_2:', a_pow_2, ', sum_so_far:',
+              sum_so_far, '\nlog(sum_so_far, 10):',
+              math.log(sum_so_far, 10), sum_so_far/max_sum,
+              max_sum - sum_so_far, '\n\n')
+    """
+
+
+    for max_sum in [1e1, 1e2, 1e3, 1e4, 1e5, 1e6]:
         pow_2s = build_2_pow_list(max_sum)
 
         # max_below = build_max_below(pow_2s, max_sum)
@@ -77,7 +128,8 @@ if __name__ == '__main__':
             # print('sums_below[prev_pow_2]:', sums_below[prev_pow_2])
             for a_prev_sum_below in sums_below[prev_pow_2]:
                 # print('a_prev_sum_below:', a_prev_sum_below)
-                for a_prev_sum_combo in sums_below[prev_pow_2][a_prev_sum_below]:
+                for a_prev_sum_combo in sums_below[prev_pow_2][
+                        a_prev_sum_below]:
                     for no_new_2_pow in range(2+1):
                         new_sum = a_prev_sum_below + this_pow_2 * no_new_2_pow
                         if new_sum > max_sum:
@@ -99,6 +151,7 @@ if __name__ == '__main__':
 
         fs_of_max_sums[max_sum] = len(sums_below[this_pow_2][max_sum])
         print('fs_of_max_sums:', fs_of_max_sums)
+
 
     totalTime = time() - startTime
     print('\nf(' + str(max_sum) + ') = ', len(sums_below[this_pow_2][max_sum]))
