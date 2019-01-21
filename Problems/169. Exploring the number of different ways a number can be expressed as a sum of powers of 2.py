@@ -26,6 +26,7 @@ Created on Fri Jan 18 13:00:00 2019
 
 from time import time
 # import math
+from convert_decimal_to_base_b import baseb
 
 
 def build_max_below(pow_2, max_value):
@@ -42,11 +43,22 @@ def build_max_below(pow_2, max_value):
 
 def build_2_pow_list(max_sum):
     pow_2 = [1]
-    while pow_2[-1] < max_sum:
+    while pow_2[-1] <= max_sum:
         pow_2.append(pow_2[-1] * 2)
     pow_2 = pow_2[:-1]
     return pow_2
 
+
+def convert_psudo_binary_to_decimal(a_num):
+    if isinstance(a_num, (int, float)):
+        a_num = str(a_num)
+    total = 0
+    for a_digit_num, a_digit in list(enumerate(reversed(a_num))):
+        try:
+            total += int(a_digit) * 2 ** a_digit_num
+        except ValueError:
+            raise ValueError('Argument must only have numerical digits')
+    return total
 
 def build_sum_below_dict(n):
     pass
@@ -56,7 +68,8 @@ if __name__ == '__main__':
     startTime = time()
     print('\n')
 
-    max_sum = 10000000000000000000000000  # 1e25
+    max_sum = 10_000_000_000_000_000_000_000_000  # i.e. 1e25 as an int
+    max_sum = 2 ** 20
     fs_of_max_sums = {}
 
     pow_2s = build_2_pow_list(max_sum)
@@ -64,6 +77,25 @@ if __name__ == '__main__':
     max_below = build_max_below(pow_2s, max_sum)
 
     good_sums_counter = 0
+    solutions = {}
+
+    for a_num in range(1, max_sum + 1):
+        print('a_num:', a_num, end='')
+        this_num_start_time = time()
+        pos_pow_2s = [x for x in pow_2s if x < a_num]
+        this_solution = []
+        max_ternary_test_no = 3 ** len(pos_pow_2s)
+        for a_ternary_val in range(max_ternary_test_no + 1):
+            tern_val_str = baseb(a_ternary_val, 3)
+            dec_value = convert_psudo_binary_to_decimal(tern_val_str)
+            if dec_value == a_num:
+                this_solution.append(tern_val_str)
+        solutions[a_num] = len(this_solution)
+        print(', f(x):', len(this_solution))
+        if time() - this_num_start_time > 10:
+            break
+
+
 
     """
     # Find the sum with using the highest values
@@ -109,7 +141,7 @@ if __name__ == '__main__':
               max_sum - sum_so_far, '\n\n')
     """
 
-
+    """
     for max_sum in [1e1, 1e2, 1e3, 1e4, 1e5, 1e6]:
         pow_2s = build_2_pow_list(max_sum)
 
@@ -151,7 +183,7 @@ if __name__ == '__main__':
 
         fs_of_max_sums[max_sum] = len(sums_below[this_pow_2][max_sum])
         print('fs_of_max_sums:', fs_of_max_sums)
-
+    """
 
     totalTime = time() - startTime
     print('\nf(' + str(max_sum) + ') = ', len(sums_below[this_pow_2][max_sum]))
